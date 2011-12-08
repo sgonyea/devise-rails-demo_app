@@ -1,4 +1,6 @@
 DemoApp::Application.routes.draw do
+  devise_for :users
+
   root :to => 'widgets#index'
 
   resources :widgets
