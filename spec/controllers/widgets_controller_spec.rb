@@ -25,133 +25,162 @@ describe WidgetsController do
   # Widget. As you add validations to Widget, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    Factory.attributes_for(:user).stringify_keys
   end
 
-  describe "GET index" do
-    it "assigns all widgets as @widgets" do
-      widget = Widget.create! valid_attributes
-      get :index
-      assigns(:widgets).should eq([widget])
-    end
-  end
-
-  describe "GET show" do
-    it "assigns the requested widget as @widget" do
-      widget = Widget.create! valid_attributes
-      get :show, :id => widget.id
-      assigns(:widget).should eq(widget)
-    end
-  end
-
-  describe "GET new" do
-    it "assigns a new widget as @widget" do
-      get :new
-      assigns(:widget).should be_a_new(Widget)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested widget as @widget" do
-      widget = Widget.create! valid_attributes
-      get :edit, :id => widget.id
-      assigns(:widget).should eq(widget)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Widget" do
-        expect {
-          post :create, :widget => valid_attributes
-        }.to change(Widget, :count).by(1)
-      end
-
-      it "assigns a newly created widget as @widget" do
-        post :create, :widget => valid_attributes
-        assigns(:widget).should be_a(Widget)
-        assigns(:widget).should be_persisted
-      end
-
-      it "redirects to the created widget" do
-        post :create, :widget => valid_attributes
-        response.should redirect_to(Widget.last)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved widget as @widget" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Widget.any_instance.stub(:save).and_return(false)
-        post :create, :widget => {}
-        assigns(:widget).should be_a_new(Widget)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Widget.any_instance.stub(:save).and_return(false)
-        post :create, :widget => {}
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested widget" do
+  context "when not logged in" do
+    describe "GET index" do
+      it "assigns all widgets as @widgets" do
         widget = Widget.create! valid_attributes
-        # Assuming there are no other widgets in the database, this
-        # specifies that the Widget created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Widget.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => widget.id, :widget => {'these' => 'params'}
+        get :index
+        assigns(:widgets).should eq([widget])
       end
+    end
 
+    describe "GET show" do
       it "assigns the requested widget as @widget" do
         widget = Widget.create! valid_attributes
-        put :update, :id => widget.id, :widget => valid_attributes
+        get :show, :id => widget.id
         assigns(:widget).should eq(widget)
-      end
-
-      it "redirects to the widget" do
-        widget = Widget.create! valid_attributes
-        put :update, :id => widget.id, :widget => valid_attributes
-        response.should redirect_to(widget)
       end
     end
 
-    describe "with invalid params" do
-      it "assigns the widget as @widget" do
-        widget = Widget.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Widget.any_instance.stub(:save).and_return(false)
-        put :update, :id => widget.id, :widget => {}
-        assigns(:widget).should eq(widget)
+    context "when attempting to use member-only functionality" do
+      describe "GET new" do
+        it "redirects you to the login page" do
+          get :new
+
+          response.should redirect_to(new_user_session_path)
+        end
       end
 
-      it "re-renders the 'edit' template" do
-        widget = Widget.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Widget.any_instance.stub(:save).and_return(false)
-        put :update, :id => widget.id, :widget => {}
-        response.should render_template("edit")
+      describe "GET edit" do
+        it "redirects you to the login page" do
+          widget = Widget.create! valid_attributes
+          get :edit, :id => widget.id
+
+          response.should redirect_to(new_user_session_path)
+        end
       end
     end
   end
 
-  describe "DELETE destroy" do
-    it "destroys the requested widget" do
-      widget = Widget.create! valid_attributes
-      expect {
-        delete :destroy, :id => widget.id
-      }.to change(Widget, :count).by(-1)
+  context "when logged in" do
+    let(:user) { Factory(:user) }
+
+    before(:each) {
+      sign_in user
+    }
+
+    describe "GET new" do
+      it "assigns a new widget as @widget" do
+        get :new
+        assigns(:widget).should be_a_new(Widget)
+      end
     end
 
-    it "redirects to the widgets list" do
-      widget = Widget.create! valid_attributes
-      delete :destroy, :id => widget.id
-      response.should redirect_to(widgets_url)
+    describe "GET edit" do
+      it "assigns the requested widget as @widget" do
+        widget = Widget.create! valid_attributes
+        get :edit, :id => widget.id
+        assigns(:widget).should eq(widget)
+      end
+    end
+
+    describe "POST create" do
+      describe "with valid params" do
+        it "creates a new Widget" do
+          expect {
+            post :create, :widget => valid_attributes
+          }.to change(Widget, :count).by(1)
+        end
+
+        it "assigns a newly created widget as @widget" do
+          post :create, :widget => valid_attributes
+          assigns(:widget).should be_a(Widget)
+          assigns(:widget).should be_persisted
+        end
+
+        it "redirects to the created widget" do
+          post :create, :widget => valid_attributes
+          response.should redirect_to(Widget.last)
+        end
+      end
+
+      describe "with invalid params" do
+        it "assigns a newly created but unsaved widget as @widget" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Widget.any_instance.stub(:save).and_return(false)
+          post :create, :widget => {}
+          assigns(:widget).should be_a_new(Widget)
+        end
+
+        it "re-renders the 'new' template" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Widget.any_instance.stub(:save).and_return(false)
+          post :create, :widget => {}
+          response.should render_template("new")
+        end
+      end
+    end
+
+    describe "PUT update" do
+      describe "with valid params" do
+        it "updates the requested widget" do
+          widget = Widget.create! valid_attributes
+          # Assuming there are no other widgets in the database, this
+          # specifies that the Widget created on the previous line
+          # receives the :update_attributes message with whatever params are
+          # submitted in the request.
+          Widget.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
+          put :update, :id => widget.id, :widget => {'these' => 'params'}
+        end
+
+        it "assigns the requested widget as @widget" do
+          widget = Widget.create! valid_attributes
+          put :update, :id => widget.id, :widget => valid_attributes
+          assigns(:widget).should eq(widget)
+        end
+
+        it "redirects to the widget" do
+          widget = Widget.create! valid_attributes
+          put :update, :id => widget.id, :widget => valid_attributes
+          response.should redirect_to(widget)
+        end
+      end
+
+      describe "with invalid params" do
+        it "assigns the widget as @widget" do
+          widget = Widget.create! valid_attributes
+          # Trigger the behavior that occurs when invalid params are submitted
+          Widget.any_instance.stub(:save).and_return(false)
+          put :update, :id => widget.id, :widget => {}
+          assigns(:widget).should eq(widget)
+        end
+
+        it "re-renders the 'edit' template" do
+          widget = Widget.create! valid_attributes
+          # Trigger the behavior that occurs when invalid params are submitted
+          Widget.any_instance.stub(:save).and_return(false)
+          put :update, :id => widget.id, :widget => {}
+          response.should render_template("edit")
+        end
+      end
+    end
+
+    describe "DELETE destroy" do
+      it "destroys the requested widget" do
+        widget = Widget.create! valid_attributes
+        expect {
+          delete :destroy, :id => widget.id
+        }.to change(Widget, :count).by(-1)
+      end
+
+      it "redirects to the widgets list" do
+        widget = Widget.create! valid_attributes
+        delete :destroy, :id => widget.id
+        response.should redirect_to(widgets_url)
+      end
     end
   end
 
