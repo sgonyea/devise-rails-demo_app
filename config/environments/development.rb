@@ -27,4 +27,15 @@ DemoApp::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  config.action_mailer.smtp_settings = {
+    :address              => 'smtp.gmail.com',
+    :domain               => 'gmail.com',
+    :authentication       => 'plain',
+    :user_name            => 'widgetstore123@gmail.com',
+    :password             => 'h4ckm3p1z',
+    :port                 => 587,
+    :enable_starttls_auto => true,
+  }
 end
