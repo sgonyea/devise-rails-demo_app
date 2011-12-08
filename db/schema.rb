@@ -17,9 +17,9 @@ ActiveRecord::Schema.define(:version => 20111208225610) do
     t.string   "email",                                 :default => "", :null => false
     t.string   "name",                                                  :null => false
     t.boolean  "is_admin"
-    t.string   "authentication_token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "authentication_token"
     t.string   "encrypted_password",     :limit => 128, :default => "", :null => false
     t.string   "confirmation_token"
     t.datetime "confirmed_at"
