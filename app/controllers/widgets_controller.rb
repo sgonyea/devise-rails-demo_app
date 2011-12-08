@@ -1,4 +1,6 @@
 class WidgetsController < ApplicationController
+  before_filter :authenticate_user!, :except => [:index, :show]
+
   # GET /widgets
   # GET /widgets.json
   def index
