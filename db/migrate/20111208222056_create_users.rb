@@ -4,10 +4,10 @@ class CreateUsers < ActiveRecord::Migration
       t.string  :email,   :null => false
       t.string  :name,    :null => false
       t.boolean :is_admin
-      t.string  :authentication_token
 
       t.timestamps
 
+      t.token_authenticatable
       t.database_authenticatable
       t.confirmable
       t.recoverable
