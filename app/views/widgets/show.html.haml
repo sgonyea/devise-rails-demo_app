@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @widget.name
+%p
+  %b Description:
+  = @widget.description
+%p
+  %b Price:
+  = @widget.price
+%p
+  %b Currency:
+  = @widget.currency
+%p
+  %b Inventory:
+  = @widget.inventory
+
+= link_to 'Edit', edit_widget_path(@widget)
+\|
+= link_to 'Back', widgets_path
